@@ -172,12 +172,13 @@ const eightWayTable = new EightWayTable();
 
 // Read address input
 function readAddress() {
-    let address = Math.floor(document.getElementById("mem-address").value / 4);
+    let address = document.getElementById("mem-address").value;
+    let word = Math.floor(address / 4);
     let binary = Number(address).toString(2);
 
-    let indexOneWay = address % 8;
-    let indexTwoWay = address % 4;
-    let indexFourWay = address % 2;
+    let indexOneWay = word % 8;
+    let indexTwoWay = word % 4;
+    let indexFourWay = word % 2;
     let tag = binary.slice(0, -3);
 
     console.log(indexOneWay);
