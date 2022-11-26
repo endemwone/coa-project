@@ -4,11 +4,18 @@ let tables = document.getElementsByClassName("cache-table");
 document.getElementById("one-way-table").style.display = "none";
 document.getElementById("two-way-table").style.display = "none";
 document.getElementById("four-way-table").style.display = "none";
+document.getElementById("eight-way-table").style.display = "none";
 
 // Hide memory input
 document.getElementsByClassName("address-input")[0].style.display = "none";
 
-let hitOrMiss = ["Miss", "Miss", "Miss"];
+// Hide stats table
+document.getElementsByClassName("stats-table")[0].style.display = "none";
+
+let hitOrMiss = ["Miss", "Miss", "Miss", "Miss"];
+let total = 0;
+let hits = [0, 0, 0, 0];
+let misses = [0, 0, 0, 0];
 
 for (let table of tables) {
     for (let i = 0, row; (row = table.rows[i]); i++) {
@@ -31,7 +38,6 @@ class Node {
 }
 
 class LRU {
-    //set default limit of 10 if limit is not passed.
     constructor(limit) {
         this.size = 0;
         this.limit = limit;
@@ -134,7 +140,7 @@ class OneWayTable {
 
 class TwoWayTable {
     constructor() {
-        this.index = new Array(8);
+        this.index = new Array(4);
         for (let i = 0; i < 8; i++) {
             this.index[i] = new LRU(2);
         }
@@ -143,9 +149,18 @@ class TwoWayTable {
 
 class FourWayTable {
     constructor() {
-        this.index = new Array(8);
+        this.index = new Array(2);
         for (let i = 0; i < 8; i++) {
             this.index[i] = new LRU(4);
+        }
+    }
+}
+
+class EightWayTable {
+    constructor() {
+        this.index = new Array(1);
+        for (let i = 0; i < 8; i++) {
+            this.index[i] = new LRU(8);
         }
     }
 }
@@ -153,72 +168,139 @@ class FourWayTable {
 const oneWayTable = new OneWayTable();
 const twoWayTable = new TwoWayTable();
 const fourWayTable = new FourWayTable();
+const eightWayTable = new EightWayTable();
 
 // Read address input
 function readAddress() {
-    let address = document.getElementById("mem-address").value;
+    let address = Math.floor(document.getElementById("mem-address").value / 4);
     let binary = Number(address).toString(2);
 
-    let index = address % 8;
+    let indexOneWay = address % 8;
+    let indexTwoWay = address % 4;
+    let indexFourWay = address % 2;
     let tag = binary.slice(0, -3);
 
-    let lruOne = oneWayTable.index[index];
-    let lruTwo = twoWayTable.index[index];
-    let lruFour = fourWayTable.index[index];
+    console.log(indexOneWay);
+
+    let lruOne = oneWayTable.index[indexOneWay];
+    let lruTwo = twoWayTable.index[indexTwoWay];
+    let lruFour = fourWayTable.index[indexFourWay];
+    let lruEight = eightWayTable.index[0];
 
     if (lruOne.read(address) === "Not found") {
         hitOrMiss[0] = "Miss";
+        misses[0]++;
+        total++;
     } else {
         hitOrMiss[0] = "Hit";
+        hits[0]++;
+        total++;
     }
 
     if (lruTwo.read(address) === "Not found") {
         hitOrMiss[1] = "Miss";
+        misses[1]++;
+        total++;
     } else {
         hitOrMiss[1] = "Hit";
+        hits[1]++;
+        total++;
     }
 
     if (lruFour.read(address) === "Not found") {
         hitOrMiss[2] = "Miss";
+        misses[2]++;
+        total++;
     } else {
         hitOrMiss[2] = "Hit";
+        hits[2]++;
+        total++;
     }
 
-    alert(
-        "1-way cache: " + hitOrMiss[0] + "\n" + "2-way cache: " + hitOrMiss[1] + "\n" + "4-way cache: " + hitOrMiss[2]
-    );
+    if (lruEight.read(address) === "Not found") {
+        hitOrMiss[3] = "Miss";
+        misses[3]++;
+        total++;
+    } else {
+        hitOrMiss[3] = "Hit";
+        hits[3]++;
+        total++;
+    }
+
+    document.getElementById("one-way").innerHTML = hitOrMiss[0];
+    document.getElementById("two-way").innerHTML = hitOrMiss[1];
+    document.getElementById("four-way").innerHTML = hitOrMiss[2];
+    document.getElementById("eight-way").innerHTML = hitOrMiss[3];
+
+    document.getElementById("hit-one").innerHTML = parseFloat(hits[0] / total).toFixed(2);
+    document.getElementById("hit-two").innerHTML = parseFloat(hits[1] / total).toFixed(2);
+    document.getElementById("hit-four").innerHTML = parseFloat(hits[2] / total).toFixed(2);
+    document.getElementById("hit-eight").innerHTML = parseFloat(hits[3] / total).toFixed(2);
+
+    document.getElementById("miss-one").innerHTML = parseFloat(misses[0] / total).toFixed(2);
+    document.getElementById("miss-two").innerHTML = parseFloat(misses[1] / total).toFixed(2);
+    document.getElementById("miss-four").innerHTML = parseFloat(misses[2] / total).toFixed(2);
+    document.getElementById("miss-eight").innerHTML = parseFloat(misses[3] / total).toFixed(2);
 
     lruOne.write(address, 1);
     lruTwo.write(address, 1);
     lruFour.write(address, 1);
+    lruEight.write(address, 1);
 
     // Update one way table
-    document.getElementsByClassName("tag")[index].innerHTML = tag;
-    document.getElementsByClassName("valid")[index].innerHTML = 1;
-    document.getElementsByClassName("data")[index].innerHTML = address;
+    document.getElementsByClassName("tag")[indexOneWay].innerHTML = tag;
+    document.getElementsByClassName("valid")[indexOneWay].innerHTML = 1;
+    document.getElementsByClassName("data")[indexOneWay].innerHTML = address;
 
     // Update two way table
-    document.getElementsByClassName("valid")[index + 8].innerHTML = 1;
-    document.getElementsByClassName("one")[index].innerHTML = Object.keys(lruTwo.cacheMap)[0]
+    document.getElementsByClassName("valid")[indexTwoWay + 8].innerHTML = 1;
+    document.getElementsByClassName("one")[indexTwoWay].innerHTML = Object.keys(lruTwo.cacheMap)[0]
         ? Object.keys(lruTwo.cacheMap)[0]
         : "";
-    document.getElementsByClassName("two")[index].innerHTML = Object.keys(lruTwo.cacheMap)[1]
+    document.getElementsByClassName("two")[indexTwoWay].innerHTML = Object.keys(lruTwo.cacheMap)[1]
         ? Object.keys(lruTwo.cacheMap)[1]
         : "";
 
     // Update four way table
-    document.getElementsByClassName("valid")[index + 16].innerHTML = 1;
-    document.getElementsByClassName("1")[index].innerHTML = Object.keys(lruFour.cacheMap)[0]
+    document.getElementsByClassName("valid")[indexFourWay + 12].innerHTML = 1;
+    document.getElementsByClassName("1")[indexFourWay].innerHTML = Object.keys(lruFour.cacheMap)[0]
         ? Object.keys(lruFour.cacheMap)[0]
         : "";
-    document.getElementsByClassName("2")[index].innerHTML = Object.keys(lruFour.cacheMap)[1]
+    document.getElementsByClassName("2")[indexFourWay].innerHTML = Object.keys(lruFour.cacheMap)[1]
         ? Object.keys(lruFour.cacheMap)[1]
         : "";
-    document.getElementsByClassName("3")[index].innerHTML = Object.keys(lruFour.cacheMap)[2]
+    document.getElementsByClassName("3")[indexFourWay].innerHTML = Object.keys(lruFour.cacheMap)[2]
         ? Object.keys(lruFour.cacheMap)[2]
         : "";
-    document.getElementsByClassName("4")[index].innerHTML = Object.keys(lruFour.cacheMap)[3]
+    document.getElementsByClassName("4")[indexFourWay].innerHTML = Object.keys(lruFour.cacheMap)[3]
         ? Object.keys(lruFour.cacheMap)[3]
+        : "";
+
+    // Update eight way table
+    document.getElementsByClassName("valid")[14].innerHTML = 1;
+    document.getElementsByClassName("11")[0].innerHTML = Object.keys(lruEight.cacheMap)[0]
+        ? Object.keys(lruEight.cacheMap)[0]
+        : "";
+    document.getElementsByClassName("22")[0].innerHTML = Object.keys(lruEight.cacheMap)[1]
+        ? Object.keys(lruEight.cacheMap)[1]
+        : "";
+    document.getElementsByClassName("33")[0].innerHTML = Object.keys(lruEight.cacheMap)[2]
+        ? Object.keys(lruEight.cacheMap)[2]
+        : "";
+    document.getElementsByClassName("44")[0].innerHTML = Object.keys(lruEight.cacheMap)[3]
+        ? Object.keys(lruEight.cacheMap)[3]
+        : "";
+    document.getElementsByClassName("55")[0].innerHTML = Object.keys(lruEight.cacheMap)[4]
+        ? Object.keys(lruEight.cacheMap)[4]
+        : "";
+    document.getElementsByClassName("66")[0].innerHTML = Object.keys(lruEight.cacheMap)[5]
+        ? Object.keys(lruEight.cacheMap)[5]
+        : "";
+    document.getElementsByClassName("77")[0].innerHTML = Object.keys(lruEight.cacheMap)[6]
+        ? Object.keys(lruEight.cacheMap)[6]
+        : "";
+    document.getElementsByClassName("88")[0].innerHTML = Object.keys(lruEight.cacheMap)[7]
+        ? Object.keys(lruEight.cacheMap)[7]
         : "";
 }
 
@@ -226,22 +308,34 @@ function showOneWayTable() {
     document.getElementById("one-way-table").style.display = "";
     document.getElementById("two-way-table").style.display = "none";
     document.getElementById("four-way-table").style.display = "none";
-    openTables = [true, false, false];
+    document.getElementById("eight-way-table").style.display = "none";
     document.getElementsByClassName("address-input")[0].style.display = "";
+    document.getElementsByClassName("stats-table")[0].style.display = "";
 }
 
 function showTwoWayTable() {
     document.getElementById("one-way-table").style.display = "none";
     document.getElementById("two-way-table").style.display = "";
     document.getElementById("four-way-table").style.display = "none";
-    openTables = [false, true, false];
+    document.getElementById("eight-way-table").style.display = "none";
     document.getElementsByClassName("address-input")[0].style.display = "";
+    document.getElementsByClassName("stats-table")[0].style.display = "";
 }
 
 function showFourWayTable() {
     document.getElementById("one-way-table").style.display = "none";
     document.getElementById("two-way-table").style.display = "none";
     document.getElementById("four-way-table").style.display = "";
-    openTables = [false, false, true];
+    document.getElementById("eight-way-table").style.display = "none";
     document.getElementsByClassName("address-input")[0].style.display = "";
+    document.getElementsByClassName("stats-table")[0].style.display = "";
+}
+
+function showEightWayTable() {
+    document.getElementById("one-way-table").style.display = "none";
+    document.getElementById("two-way-table").style.display = "none";
+    document.getElementById("four-way-table").style.display = "none";
+    document.getElementById("eight-way-table").style.display = "";
+    document.getElementsByClassName("address-input")[0].style.display = "";
+    document.getElementsByClassName("stats-table")[0].style.display = "";
 }

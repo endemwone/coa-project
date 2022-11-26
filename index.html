@@ -19,6 +19,7 @@
             <button onclick="showOneWayTable()">1-way</button>
             <button onclick="showTwoWayTable()">2-way</button>
             <button onclick="showFourWayTable()">4-way</button>
+            <button onclick="showEightWayTable()">Fully Associated</button>
         </div>
 
     </div>
@@ -123,30 +124,6 @@
                 <td class="data one"></td>
                 <td class="data two"></td>
             </tr>
-            <tr>
-                <td class="index"></td>
-                <td class="valid"></td>
-                <td class="data one"></td>
-                <td class="data two"></td>
-            </tr>
-            <tr>
-                <td class="index"></td>
-                <td class="valid"></td>
-                <td class="data one"></td>
-                <td class="data two"></td>
-            </tr>
-            <tr>
-                <td class="index"></td>
-                <td class="valid"></td>
-                <td class="data one"></td>
-                <td class="data two"></td>
-            </tr>
-            <tr>
-                <td class="index"></td>
-                <td class="valid"></td>
-                <td class="data one"></td>
-                <td class="data two"></td>
-            </tr>
         </table>
 
         <table id="four-way-table" class="cache-table">
@@ -179,53 +156,70 @@
                 <td class="data 3"></td>
                 <td class="data 4"></td>
             </tr>
+        </table>
+
+        <table id="eight-way-table" class="cache-table">
             <tr>
-                <td class="index"></td>
-                <td class="valid"></td>
-                <td class="data 1"></td>
-                <td class="data 2"></td>
-                <td class="data 3"></td>
-                <td class="data 4"></td>
+                <th style="border: 0px;">Index</th>
+                <th style="border-bottom: 0px;">Valid</th>
+                <th colspan="8">Data</th>
+            </tr>
+            <tr>
+                <th style="border: 0px;"></th>
+                <th style="border-top: 0px;"></th>
+                <th>Block 1</th>
+                <th>Block 2</th>
+                <th>Block 3</th>
+                <th>Block 4</th>
+                <th>Block 5</th>
+                <th>Block 6</th>
+                <th>Block 7</th>
+                <th>Block 8</th>
             </tr>
             <tr>
                 <td class="index"></td>
                 <td class="valid"></td>
-                <td class="data 1"></td>
-                <td class="data 2"></td>
-                <td class="data 3"></td>
-                <td class="data 4"></td>
+                <td class="data 11"></td>
+                <td class="data 22"></td>
+                <td class="data 33"></td>
+                <td class="data 44"></td>
+                <td class="data 55"></td>
+                <td class="data 66"></td>
+                <td class="data 77"></td>
+                <td class="data 88"></td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="stats">
+        <table class="stats-table">
+            <tr>
+                <th>One way</th>
+                <th>Hit Rate</th>
+                <th>Miss Rate</th>
+                <th>Two way</th>
+                <th>Hit Rate</th>
+                <th>Miss Rate</th>
+                <th>Four way</th>
+                <th>Hit Rate</th>
+                <th>Miss Rate</th>
+                <th>Fully associated</th>
+                <th>Hit Rate</th>
+                <th>Miss Rate</th>
             </tr>
             <tr>
-                <td class="index"></td>
-                <td class="valid"></td>
-                <td class="data 1"></td>
-                <td class="data 2"></td>
-                <td class="data 3"></td>
-                <td class="data 4"></td>
-            </tr>
-            <tr>
-                <td class="index"></td>
-                <td class="valid"></td>
-                <td class="data 1"></td>
-                <td class="data 2"></td>
-                <td class="data 3"></td>
-                <td class="data 4"></td>
-            </tr>
-            <tr>
-                <td class="index"></td>
-                <td class="valid"></td>
-                <td class="data 1"></td>
-                <td class="data 2"></td>
-                <td class="data 3"></td>
-                <td class="data 4"></td>
-            </tr>
-            <tr>
-                <td class="index"></td>
-                <td class="valid"></td>
-                <td class="data 1"></td>
-                <td class="data 2"></td>
-                <td class="data 3"></td>
-                <td class="data 4"></td>
+                <td id="one-way"></td>
+                <td id="hit-one"></td>
+                <td id="miss-one"></td>
+                <td id="two-way"></td>
+                <td id="hit-two"></td>
+                <td id="miss-two"></td>
+                <td id="four-way"></td>
+                <td id="hit-four"></td>
+                <td id="miss-four"></td>
+                <td id="eight-way"></td>
+                <td id="hit-eight"></td>
+                <td id="miss-eight"></td>
             </tr>
         </table>
     </div>
