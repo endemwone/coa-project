@@ -13,7 +13,9 @@ h2 {
 
 .association-select {
     justify-content: space-evenly;
-    padding: 0.5em 40em 2em 40em;
+    padding: 1em;
+    width: 25%;
+    margin: auto;
 }
 
 .cache-table {
